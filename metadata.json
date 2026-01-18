@@ -1,0 +1,7 @@
+{
+  "name": "Clínica Santa Maria dos Olivais Replica",
+  "description": "A faithful React recreation of the Clínica Santa Maria dos Olivais website, featuring comprehensive pages for Home, Team, Clinic, Contacts, Appointments, and Campaigns. Includes integrated Google Ads and Meta Pixel tracking.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
