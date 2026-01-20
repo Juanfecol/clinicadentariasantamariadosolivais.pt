@@ -1,8 +1,13 @@
 import React from 'react';
 import { useContent } from '../context/ContentContext';
+import { trackServiceView, trackCTAClick } from '../utils/googleAdsTracking';
+import { usePageTracker } from '../hooks/usePageTracker';
 
 const Clinic: React.FC = () => {
   const { content } = useContent();
+    
+  // Track page view
+  usePageTracker('servicios', ['implantes', 'ortodoncia', 'blanqueamiento', 'estetica']);
   const gallery = content.clinic?.gallery || [];
 
   return (
