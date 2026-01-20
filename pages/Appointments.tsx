@@ -1,9 +1,14 @@
 import React from 'react';
 import { useContent } from '../context/ContentContext';
 import { useLocation } from 'react-router-dom';
+import { trackFormSubmission, trackScheduleClick } from '../utils/googleAdsTracking';
+import { usePageTracker } from '../hooks/usePageTracker';
 
 const Appointments: React.FC = () => {
   const { content } = useContent();
+    
+  // Track page view
+  usePageTracker('citas');
   const appointmentsData = content.appointments || { heroImage: "", services: [] };
   const services = appointmentsData.services || [];
   
