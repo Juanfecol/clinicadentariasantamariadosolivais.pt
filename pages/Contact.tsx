@@ -1,5 +1,6 @@
 import React from 'react';
 import { useContent } from '../context/ContentContext';
+import { trackPhoneClick, trackWhatsAppClick, trackEmailClick, trackSocialClick, trackMapClick } from '../utils/googleAdsTracking';
 
 const Contact: React.FC = () => {
   const { content } = useContent();
@@ -17,27 +18,32 @@ const Contact: React.FC = () => {
           <div className="space-y-8 text-center md:text-left">
             <div>
               <h3 className="text-2xl font-bold text-clinic-blue mb-4">Email</h3>
-              <a href={`mailto:${global.email}`} className="text-xl text-gray-700 hover:text-clinic-blue transition-colors break-all">{global.email}</a>
+              <a href={`mailto:${global.email}`} className="text-xl text-gray-700 hover:text-clinic-blue transition-colors break-all">{global.email}</a> onClick={() => trackEmailClick(global.email)}
+              
             </div>
             <div>
               <h3 className="text-2xl font-bold text-clinic-blue mb-4">Telefone</h3>
-              <a href={`tel:${global.phone}`} className="text-xl text-gray-700 font-medium hover:text-clinic-blue transition-colors">{global.phone}</a>
+              <a href={`tel:${global.phone}`} className="text-xl text-gray-700 font-medium hover:text-clinic-blue transition-colors">{global.phone}</a> onClick={() => trackPhoneClick(global.phone)}
+              
               <div className="text-sm text-gray-500 mt-1">(Preço de uma chamada de Rede Nacional)</div>
             </div>
             <div>
               <h3 className="text-2xl font-bold text-clinic-blue mb-4">Telemóvel / WhatsApp</h3>
-              <a href={global.socials?.whatsapp || "#"} target="_blank" rel="noreferrer" className="text-xl text-gray-700 font-medium hover:text-clinic-blue transition-colors">{global.mobile}</a>
+              <a href={global.socials?.whatsapp || "#"} target="_blank" rel="noreferrer" className="text-xl text-gray-700 font-medium hover:text-clinic-blue transition-colors">{global.mobile}</a> onClick={() => trackWhatsAppClick()}
+              
               <div className="text-sm text-gray-500 mt-1">(Preço de uma chamada de Rede Móvel Nacional)</div>
             </div>
             
             <div className="pt-6 flex justify-center md:justify-start gap-4">
                {global.socials?.facebook && (
-                 <a href={global.socials.facebook} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-[#3b5998] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-md">
+                 <a href={global.socials.facebook} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-[#3b5998] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-md"> onClick={() => trackSocialClick('facebook')}
+                   
                    <i className="fab fa-facebook-f text-xl"></i>
                  </a>
                )}
                {global.socials?.instagram && (
-                 <a href={global.socials.instagram} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#f09433] to-[#bc1888] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-md">
+                 <a href={global.socials.instagram} target="_blank" rel="noreferrer" className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#f09433] to-[#bc1888] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-md"> onClick={() => trackSocialClick('instagram')}
+                   
                    <i className="fab fa-instagram text-xl"></i>
                  </a>
                )}
@@ -57,7 +63,8 @@ const Contact: React.FC = () => {
             loading="lazy"
           ></iframe>
           <a 
-            href={global.mapsLink || "#"}
+            href={global.mapsLink || "#"} onClick={() => trackMapClick()}
+            
             target="_blank"
             rel="noreferrer"
             className="absolute bottom-4 right-4 bg-white text-clinic-blue px-4 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity font-semibold text-sm"
