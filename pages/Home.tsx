@@ -2,10 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 import { trackCTAClick, trackPageView, trackSectionView } from '../utils/googleAdsTracking';
+import { usePageTracker } from '../hooks/usePageTracker';
 
 // CONTROL POINT: HOME PAGE CONTENT
 const Home: React.FC = () => {
   const { content } = useContent();
+    
+  // Track page view and sections
+  usePageTracker('home', ['hero', 'servicios', 'testimonios', 'equipo']);
   const { heroTitle, heroSubtitle } = content.home;
 
   // Video Control State for "Video Escalas"
