@@ -1,5 +1,7 @@
 import React from 'react';
 import { useContent } from '../context/ContentContext';
+import { trackDoctorView, trackCTAClick } from '../utils/googleAdsTracking';
+import { usePageTracker } from '../hooks/usePageTracker';
 
 interface Member {
   name: string;
@@ -24,6 +26,9 @@ const MemberCard: React.FC<{ member: Member }> = ({ member }) => (
 
 const Team: React.FC = () => {
   const { content } = useContent();
+    
+  // Track page view
+  usePageTracker('equipo');
   const medicalTeam: Member[] = content.team?.medical || [];
   const assistantTeam: Member[] = content.team?.assistants || [];
   const receptionTeam: Member[] = content.team?.reception || [];
