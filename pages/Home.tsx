@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
+import { trackCTAClick, trackPageView, trackSectionView } from '../utils/googleAdsTracking';
 
 // CONTROL POINT: HOME PAGE CONTENT
 const Home: React.FC = () => {
