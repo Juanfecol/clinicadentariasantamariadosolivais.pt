@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // --- INITIAL DEFAULT DATA (Expanded for full control) ---
 const defaultData = {
@@ -118,7 +118,6 @@ const defaultData = {
         bio: "Especialista em odontopediatria, com formação em cuidados dentários para crianças."
       }
     ],
-    // Made assistant team dynamic as well
     assistants: [
       {
         name: "Karina Palmeira",
@@ -183,9 +182,19 @@ const ContentContext = createContext<any>(null);
 
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState(() => {
-    // Try to load from local storage first to persist changes
-    const saved = localStorage.getItem('site_content_v2'); // bumped version to v2 to force reload new structure
-    return saved ? JSON.parse(saved) : defaultData;
+    try {
+      const saved = localStorage.getItem('site_content_v2');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Simple structural check - if parsed doesn't have 'global', it's likely old/corrupt
+        if (parsed && parsed.global) {
+           return parsed;
+        }
+      }
+    } catch (e) {
+      console.error("Content load failed, reverting to default", e);
+    }
+    return defaultData;
   });
 
   const updateContent = (newContent: any) => {
