@@ -1,13 +1,8 @@
 import React from 'react';
 import { useContent } from '../context/ContentContext';
-import { trackCTAClick } from '../utils/googleAdsTracking';
-import { usePageTracker } from '../hooks/usePageTracker';
 
 const Campaigns: React.FC = () => {
   const { content } = useContent();
-    
-  // Track page view
-  usePageTracker('campanas');
   const campaigns = content.campaigns || [];
   const global = content.global || {};
 
