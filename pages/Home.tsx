@@ -1,45 +1,58 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
-import { trackCTAClick, trackPageView, trackSectionView } from '../utils/googleAdsTracking';
-import { usePageTracker } from '../hooks/usePageTracker';
 
 // CONTROL POINT: HOME PAGE CONTENT
 const Home: React.FC = () => {
   const { content } = useContent();
-    
-  // Track page view and sections
-  usePageTracker('home', ['hero', 'servicios', 'testimonios', 'equipo']);
   const { heroTitle, heroSubtitle } = content.home;
 
   // Video Control State for "Video Escalas"
-  // Default is false (Unmuted/Sound Active) per request
   const [isMuted, setIsMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Scroll Observer: Pause when out of view, Play when in view
+  // Toggle Mute Function
+  const toggleMute = () => {
+    if (videoRef.current) {
+      const newMutedState = !isMuted;
+      videoRef.current.muted = newMutedState;
+      setIsMuted(newMutedState);
+    }
+  };
+
+  // Optimized Scroll Observer
   useEffect(() => {
+    const videoElement = videoRef.current;
+    
+    if (!videoElement) return;
+
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (videoRef.current) {
-          if (entry.isIntersecting) {
-            // Video is visible -> Play
-            const playPromise = videoRef.current.play();
-            if (playPromise !== undefined) {
-              playPromise.catch(error => {
-                console.log("Autoplay interrupted or blocked:", error);
-                // Fallback: if browser blocks autoplay due to sound, mute and force play
-                // This fixes the "video taking too long/stuck" issue on mobile/safari
-                if (videoRef.current) {
-                   videoRef.current.muted = true;
-                   videoRef.current.play().catch(e => console.log("Retry failed:", e));
-                   setIsMuted(true); // Update state to reflect forced mute
-                }
-              });
-            }
-          } else {
-            // Video is hidden -> Pause
-            videoRef.current.pause();
+      async ([entry]) => {
+        if (!videoElement) return;
+
+        if (entry.isIntersecting) {
+          // Attempt to play
+          try {
+             // Sync state before playing
+             videoElement.muted = isMuted; 
+             await videoElement.play();
+          } catch (error) {
+             console.debug("Autoplay blocked or interrupted, retrying muted.");
+             // Fallback: Force mute to allow autoplay if browser blocked audio
+             videoElement.muted = true;
+             setIsMuted(true);
+             try {
+               await videoElement.play();
+             } catch (e) {
+               // Silent fail if interaction completely blocked (rare in this context)
+             }
+          }
+        } else {
+          // Pause when out of view
+          try {
+            videoElement.pause();
+          } catch (e) {
+            // Ignore pause errors (e.g. if already paused)
           }
         }
       },
@@ -48,16 +61,12 @@ const Home: React.FC = () => {
       }
     );
 
-    if (videoRef.current) {
-      observer.observe(videoRef.current);
-    }
+    observer.observe(videoElement);
 
     return () => {
-      if (videoRef.current) {
-        observer.unobserve(videoRef.current);
-      }
+      observer.disconnect();
     };
-  }, []);
+  }, [isMuted]); 
 
   return (
     <div className="animate-fade-in-up">
@@ -121,7 +130,7 @@ const Home: React.FC = () => {
                    <i className="fas fa-plane text-clinic-blue text-xl transform -rotate-45"></i>
                 </div>
 
-                {/* Video Element with NATIVE CONTROLS */}
+                {/* Video Element - AUTO PLAY, NO CONTROLS, DEFAULT SOUND */}
                 <video 
                    ref={videoRef}
                    // Optimized URL: w_600 (resize), vc_auto (codec), f_auto (format), q_auto (quality)
@@ -130,12 +139,20 @@ const Home: React.FC = () => {
                    poster="https://res.cloudinary.com/dgvavcxlz/video/upload/w_600,f_auto,q_auto,so_0/v1768688465/IMPLANTES_LISTO_bdwqnq.jpg"
                    className="w-full h-full object-cover aspect-[9/16]"
                    loop
-                   muted={isMuted}
+                   muted={isMuted} // Controlled by React state
                    playsInline
                    preload="auto"
-                   controls // ADDED: Multimedia controls for user interaction
-                   controlsList="nodownload noremoteplayback" // Clean controls
+                   // Removed 'controls' attribute as requested
                 />
+
+                {/* Custom Mute/Unmute Button */}
+                <button 
+                  onClick={toggleMute}
+                  className="absolute bottom-4 right-4 z-30 w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-clinic-lime hover:text-clinic-blue transition-colors shadow-lg"
+                  aria-label={isMuted ? "Ligar som" : "Desligar som"}
+                >
+                   <i className={`fas ${isMuted ? 'fa-volume-mute' : 'fa-volume-up'}`}></i>
+                </button>
              </div>
              
              {/* Ver Mais Button - NEW ADDITION */}
