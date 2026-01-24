@@ -27,10 +27,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }, [location]);
 
   // Duplicate stories to create the infinite scroll effect
-  // If we have few stories, duplicate more times to fill width
   const displayStories = storiesData.length < 5 
     ? [...storiesData, ...storiesData, ...storiesData, ...storiesData] 
     : [...storiesData, ...storiesData];
+
+  // Robust email and phone sanitization for links
+  const contactEmail = (global.email && global.email.trim() !== "") ? global.email.trim() : "clinicasmod@gmail.com";
+  const contactPhone = global.phone ? global.phone.replace(/\s+/g, '') : "";
 
   return (
     <div className="flex flex-col min-h-screen font-sans text-clinic-blue bg-clinic-bg">
@@ -48,12 +51,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </Link>
 
         {/* Stories Container (Center) */}
-        <div className="flex-1 overflow-hidden lg:overflow-visible mx-2 md:mx-6 mask-linear h-full flex items-center">
-           <div className="flex gap-3 md:gap-8 animate-scroll lg:animate-none hover:pause w-max lg:w-full lg:justify-center lg:items-center lg:overflow-x-auto lg:no-scrollbar">
+        {/* CONTROL POINT: SCROLLING ENABLED FOR DESKTOP */}
+        <div className="flex-1 overflow-hidden mx-2 md:mx-6 mask-linear h-full flex items-center">
+           <div className="flex gap-3 md:gap-8 animate-scroll hover:pause w-max">
             {displayStories.map((story: Story, index: number) => (
               <div 
                 key={`${story.id}-${index}`} 
-                className={`flex flex-col items-center cursor-pointer group flex-shrink-0 ${index >= storiesData.length ? 'lg:hidden' : ''}`}
+                className={`flex flex-col items-center cursor-pointer group flex-shrink-0`}
                 onClick={() => setViewingStory(story)}
               >
                 <div className="w-[65px] h-[65px] md:w-[85px] md:h-[85px] rounded-full p-[3px] bg-gradient-to-tr from-clinic-lime to-clinic-blue hover:from-clinic-purple hover:to-clinic-lime transition-all duration-300 transform group-hover:scale-105 shadow-sm">
@@ -67,7 +71,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         loop
                         playsInline
                         poster={story.thumbnail}
-                        preload="metadata" // Optimization
+                        preload="metadata"
                       />
                     ) : (
                       <img 
@@ -113,7 +117,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 controls 
                 autoPlay 
                 playsInline
-                preload="metadata" // Optimization
+                preload="metadata"
               />
             ) : (
               <img 
@@ -129,7 +133,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       )}
 
-      {/* Full Screen Navigation Overlay - DYNAMIC */}
+      {/* Full Screen Navigation Overlay */}
       <div className={`fixed inset-0 bg-white/90 backdrop-blur-xl z-40 flex flex-col justify-center items-center transition-all duration-500 ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
         <nav>
           <ul className="text-center space-y-6">
@@ -162,7 +166,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {children}
       </main>
 
-      {/* Footer - DYNAMIC */}
+      {/* Footer */}
       <footer className="bg-clinic-blue text-[#f2f2f2] pt-[60px] pb-[40px] px-[20px] md:px-[40px]">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center mb-[50px]">
@@ -204,11 +208,25 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <div className="flex flex-col gap-8 md:items-end items-center text-center md:text-right">
               <div>
                 <h4 className="text-xl font-medium mb-2">E-mail para contacto</h4>
-                <a href={`mailto:${global.email}`} className="text-lg text-clinic-purple font-light hover:text-white transition-colors">{global.email}</a>
+                {/* Fixed: Robust mailto link with target="_self" to force app opening */}
+                <a 
+                  href={`mailto:${contactEmail}`} 
+                  target="_self"
+                  className="text-lg text-clinic-purple font-light hover:text-white transition-colors"
+                >
+                  {contactEmail}
+                </a>
               </div>
               <div>
                 <h4 className="text-xl font-medium mb-2">Número de telefone</h4>
-                <a href={`tel:${global.phone}`} className="text-lg text-clinic-purple font-light hover:text-white transition-colors">{global.phone}</a>
+                {/* Fixed: Ensure phone link uses tel protocol with target="_self" */}
+                <a 
+                  href={`tel:${contactPhone}`} 
+                  target="_self"
+                  className="text-lg text-clinic-purple font-light hover:text-white transition-colors"
+                >
+                  {global.phone}
+                </a>
                 <p className="text-sm text-gray-400 mt-1">(Preço de uma chamada de Rede Nacional)</p>
               </div>
               <div>
@@ -220,10 +238,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
 
           <div className="border-t-2 border-clinic-lime pt-8 flex flex-col md:flex-row justify-center gap-6 md:gap-10 text-center text-sm font-medium">
-            <a href="#" className="hover:text-clinic-purple transition-colors">TERMOS E CONDIÇÕES</a>
-            <a href="#" className="hover:text-clinic-purple transition-colors">POLÍTICA DE COOKIES</a>
-            <a href="#" className="hover:text-clinic-purple transition-colors">POLÍTICA DE PRIVACIDADE</a>
-            <a href="https://www.livroreclamacoes.pt/Inicio/" target="_blank" rel="noreferrer" className="hover:text-clinic-purple transition-colors">LIVRO DE RECLAMAÇÕES</a>
+            {/* CONTROL POINT: ACTUALIZACION POLITICAS - Updated Footer Links */}
+            <Link to="/termos" className="hover:text-clinic-purple transition-colors uppercase">Termos e Condições</Link>
+            <Link to="/cookies" className="hover:text-clinic-purple transition-colors uppercase">Política de Cookies</Link>
+            <Link to="/privacidade" className="hover:text-clinic-purple transition-colors uppercase">Política de Privacidade</Link>
+            <a href="https://www.livroreclamacoes.pt/Inicio/" target="_blank" rel="noreferrer" className="hover:text-clinic-purple transition-colors uppercase">Livro de Reclamações</a>
           </div>
         </div>
       </footer>
@@ -236,10 +255,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         className="fixed bottom-4 right-4 z-[90] w-14 h-14 flex items-center justify-center rounded-full shadow-lg transition-transform hover:scale-110"
         aria-label="Contact us on WhatsApp"
       >
-        {/* Wave effect */}
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-30 animate-ping" style={{ animationDuration: '2s' }}></span>
         <span className="absolute inline-flex h-full w-full rounded-full bg-[#25D366]"></span>
-        
         <i className="fab fa-whatsapp text-3xl text-white relative z-10"></i>
       </a>
     </div>
