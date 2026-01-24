@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation, Link, Navigate } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 
 // CONTROL POINT: LEAD SUBMISSION AND THANK YOU PAGE
@@ -8,16 +8,18 @@ const ThankYou: React.FC = () => {
   const { content } = useContent();
   const global = content.global || {};
   
-  // If no data (direct access), redirect to home
-  if (!state) {
-    return <Navigate to="/" replace />;
-  }
+  // FIX: Datos de respaldo por si se accede directamente (para evitar pantalla en blanco)
+  const displayData = state || {
+    nome: "Estimado Paciente",
+    email: "contacto@exemplo.com",
+    telemovel: "---",
+    servico: "Consulta Geral"
+  };
 
   // Construct WhatsApp Message Dynamically from Content Context
-  // Clean phone extraction for fallback
   const rawPhone = global.mobile ? global.mobile.replace(/\D/g, '') : "351919861310";
   
-  const waMessage = `Olá, o meu nome é ${state.nome}. Acabei de preencher o formulário no site sobre ${state.servico || 'uma consulta'} e gostaria de ser contactado.`;
+  const waMessage = `Olá, o meu nome é ${displayData.nome}. Acabei de preencher o formulário no site sobre ${displayData.servico || 'uma consulta'} e gostaria de ser contactado.`;
   const finalWaLink = `https://wa.me/${rawPhone}?text=${encodeURIComponent(waMessage)}`;
 
   return (
@@ -45,20 +47,20 @@ const ThankYou: React.FC = () => {
           <div className="space-y-3">
              <div className="flex justify-between">
                <span className="text-gray-500">Nome:</span>
-               <span className="font-medium text-clinic-blue truncate ml-4">{state.nome}</span>
+               <span className="font-medium text-clinic-blue truncate ml-4">{displayData.nome}</span>
              </div>
              <div className="flex justify-between">
                <span className="text-gray-500">Email:</span>
-               <span className="font-medium text-clinic-blue truncate ml-4">{state.email}</span>
+               <span className="font-medium text-clinic-blue truncate ml-4">{displayData.email}</span>
              </div>
              <div className="flex justify-between">
                <span className="text-gray-500">Telemóvel:</span>
-               <span className="font-medium text-clinic-blue">{state.telemovel}</span>
+               <span className="font-medium text-clinic-blue">{displayData.telemovel}</span>
              </div>
-             {state.servico && (
+             {displayData.servico && (
                <div className="flex justify-between">
                  <span className="text-gray-500">Interesse:</span>
-                 <span className="font-medium text-clinic-purple">{state.servico}</span>
+                 <span className="font-medium text-clinic-purple">{displayData.servico}</span>
                </div>
              )}
           </div>
