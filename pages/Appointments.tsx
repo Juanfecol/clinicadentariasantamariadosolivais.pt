@@ -16,9 +16,7 @@ const Appointments: React.FC = () => {
 
   const [isSending, setIsSending] = useState(false);
 
-  // --- CONTROL POINT: RESTORE PREVIOUS LOGIC FROM HERE IF NEEDED ---
-  // To restore, revert changes to the handleSubmit function below.
-
+  // --- CONTROL POINT: FORM LOGIC START ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -99,7 +97,7 @@ const Appointments: React.FC = () => {
       setIsSending(false);
     }
   };
-  // --- CONTROL POINT: END OF NEW FORM LOGIC ---
+  // --- CONTROL POINT: FORM LOGIC END ---
 
   return (
     <div className="animate-fade-in-up max-w-[1400px] mx-auto px-4 py-12">
