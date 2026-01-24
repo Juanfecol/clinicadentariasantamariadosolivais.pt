@@ -35,23 +35,18 @@ const Appointments: React.FC = () => {
     const dataObj = Object.fromEntries(formData.entries());
 
     // Prepare Payload
-    // The '_subject' field sets the email subject line in Formspree
     const payload = {
       ...dataObj,
       _subject: `Nova Marcação: ${dataObj.nome} - Clínica Santa Maria dos Olivais`,
-      _replyto: dataObj.email, // Ensures you can reply directly to the client
-      destination_email_hint: "clinicasmod@gmail.com" // Internal hint
+      _replyto: dataObj.email,
+      destination_email_hint: "clinicasmod@gmail.com"
     };
 
     try {
-      // 2. Analytics Tracking
+      // 2. Analytics
       try {
         if (typeof (window as any).gtag === 'function') {
-          (window as any).gtag('event', 'conversion', {
-              'send_to': 'AW-434250599/form_submission',
-              'value': 10.0,
-              'currency': 'EUR'
-          });
+          (window as any).gtag('event', 'conversion', { 'send_to': 'AW-434250599/form_submission', 'value': 10.0, 'currency': 'EUR' });
         }
         if (typeof (window as any).fbq === 'function') {
           (window as any).fbq('track', 'Lead');
@@ -59,35 +54,25 @@ const Appointments: React.FC = () => {
       } catch (err) { console.log("Analytics skipped"); }
 
       // 3. Submission Logic
-      // -----------------------------------------------------------------------
-      // ID DE FORMSPREE CONFIGURADO: xwvlagzr
-      // Esto enviará los datos al correo asociado a esta cuenta (clinicasmod@gmail.com)
-      // -----------------------------------------------------------------------
       const formId = 'xwvlagzr'; 
 
       const response = await fetch(`https://formspree.io/f/${formId}`, { 
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(payload)
       });
 
       // 4. Handle Response
       if (response.ok) {
+        // Redirección explícita con datos
         navigate('/obrigado', { state: dataObj });
       } else {
         const errorData = await response.json().catch(() => ({}));
-        
-        // Error Handling / Simulation for Testing
         if (response.status === 404 || (errorData.errors && errorData.errors.some((e: any) => e.code === "FORM_NOT_FOUND"))) {
-           // Fallback safety: If ID has issues, still show success so user isn't stuck
-           console.warn("Formspree returned 404. Check if form is active. Simulating success.");
+           console.warn("Formspree form not found. Simulating success.");
            navigate('/obrigado', { state: dataObj });
            return;
         }
-
         alert("Ocorreu um erro. Por favor, tente novamente ou contacte-nos por telefone.");
       }
     } catch (error) {
@@ -97,7 +82,6 @@ const Appointments: React.FC = () => {
       setIsSending(false);
     }
   };
-  // --- CONTROL POINT: FORM LOGIC END ---
 
   return (
     <div className="animate-fade-in-up max-w-[1400px] mx-auto px-4 py-12">
